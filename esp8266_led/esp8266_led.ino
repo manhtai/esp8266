@@ -30,7 +30,7 @@ void setup() {
   pinMode(btnPin, INPUT_PULLUP);
   attachInterrupt(btnPin, toggle, FALLING);
   
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setDebugOutput(true);
 }
 
