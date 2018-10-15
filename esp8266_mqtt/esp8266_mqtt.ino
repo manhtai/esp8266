@@ -11,6 +11,9 @@
 #include <Ticker.h>
 Ticker ticker;
 
+// D pins, D0 & D4 are 2 built-in LEDs
+int D[] = {D0, D1, D2, D3, D4, D5, D6, D7, D8, D9};
+
 // MQTT
 // TODO: Replace this with your server
 const char* mqttServer = "test.mosquitto.org";
@@ -29,15 +32,13 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is active low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  }
+  // Switch on/off the D pin if an D was received as first character
+  if (length < 2 || (char)payload[0] != 'D')
+    return;
 
+  int led = (char)payload[1] - '0';
+  int state = digitalRead(D[led]);
+  digitalWrite(D[led], !state);
 }
 
 void mqttReconnect() {
@@ -113,10 +114,16 @@ void mqttSetup() {
   client.setCallback(mqttCallback);  
 }
 
+void ledSetup() {
+  for (int i = 0; i < 9; i++) {
+      pinMode(D[i], OUTPUT);
+  }
+}
+
 
 void setup() {
-  pinMode(BUILTIN_LED, OUTPUT);
   Serial.begin(115200);
+  ledSetup();
   wifiSetup();
   mqttSetup();
 }
