@@ -17,6 +17,9 @@ int D[10] = {D0, D1, D2, D3, D4, D5, D6, D7, D8, D9};
 // MQTT
 // TODO: Replace this with your server
 const char* mqttServer = "test.mosquitto.org";
+const char* mqttUsername = NULL;
+const char* mqttPassword = NULL;
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
@@ -49,7 +52,7 @@ void mqttReconnect() {
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
     // Attempt to connect
-    if (client.connect(clientId.c_str())) {
+    if (client.connect(clientId.c_str(), mqttUsername, mqttPassword)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
       client.publish("outTopic", "Connected!");
