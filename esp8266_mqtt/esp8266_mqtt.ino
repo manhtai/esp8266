@@ -12,7 +12,7 @@
 Ticker ticker;
 
 // D pins, D0 & D4 are 2 built-in LEDs
-int D[] = {D0, D1, D2, D3, D4, D5, D6, D7, D8, D9};
+int D[10] = {D0, D1, D2, D3, D4, D5, D6, D7, D8, D9};
 
 // MQTT
 // TODO: Replace this with your server
@@ -20,8 +20,8 @@ const char* mqttServer = "test.mosquitto.org";
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
-char msg[50];
-int value = 0;
+char msg[100];
+char tmpMsg[10];
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -52,7 +52,7 @@ void mqttReconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("outTopic", "hello world");
+      client.publish("outTopic", "Connected!");
       // ... and resubscribe
       client.subscribe("inTopic");
     } else {
@@ -115,7 +115,7 @@ void mqttSetup() {
 }
 
 void ledSetup() {
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
       pinMode(D[i], OUTPUT);
   }
 }
@@ -133,12 +133,15 @@ void loop() {
     mqttReconnect();
   }
   client.loop();
-
   long now = millis();
+  
   if (now - lastMsg > 2000) {
     lastMsg = now;
-    ++value;
-    snprintf (msg, 75, "hello world #%ld", value);
+    strcpy(msg, "");
+    for (int i = 0; i < 10; i++) {
+        sprintf(tmpMsg, "D%i:%i ", i, digitalRead(D[i]));
+        strcat(msg, tmpMsg);
+    }
     Serial.print("Publish message: ");
     Serial.println(msg);
     client.publish("outTopic", msg);
