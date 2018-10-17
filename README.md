@@ -1,5 +1,8 @@
 # ESP8266 NodeMCU sample code
 
+![Node MCU](./nodemcu.png)
+
+
 ## Install
 
 ### CP210x drivers
